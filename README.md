@@ -1,9 +1,40 @@
-# Formulário de Login
-Formulário de Login de Glassmorphism Animado usando Html e CSS
+# Glassmorphism Animated Login & Registration App
 
-## Foi criado login animado utilizando CSS e HTML puro.
+A responsive Glassmorphism Login, Registration, and Password Recovery Web Application featuring:
+- ☀️ Light & 🌙 Dark Glassmorphism Themes
+- 🇧🇩 Country Code Phone Picker (Default: Bangladesh +880)
+- 👁️ Show/Hide Password Toggles
+- 🔒 Real-time Field Validation & Password Strength Meter
+- ⏰ Real-time Clock & Date Widget
+- ⚡ Vercel Serverless API (`/api/data`)
 
-### Veja como ficou o site: https://animado-login.netlify.app/
+## 🚀 How to Deploy on Vercel
 
+### Option 1: Via GitHub (Recommended - 1 Click)
+1. Push this project repository to **GitHub**.
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New"** > **"Project"**.
+3. Import your GitHub repository.
+4. Keep all default settings (Framework Preset: **Other** / **Static**) and click **"Deploy"**.
+5. Vercel will instantly host your static frontend and serverless API routes (`/api/data`).
 
-![Capturar](https://user-images.githubusercontent.com/105869015/223727775-96ddf117-a812-4d80-bbd3-e4a9f662596a.PNG)
+### Option 2: Via Vercel CLI
+1. Install Vercel CLI globally:
+   ```bash
+   npm i -g vercel
+   ```
+2. Run `vercel` command in the root folder:
+   ```bash
+   vercel
+   ```
+3. Follow the CLI prompts to deploy immediately.
+
+---
+
+## 🛠 Local Development
+To run the server locally:
+```bash
+npm install
+npm run dev
+```
+Open `http://localhost:3000` in your browser.
+

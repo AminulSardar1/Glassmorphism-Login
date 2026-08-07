@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Glassmorphism Login & Sign Up</title>
     <link rel="stylesheet" href="style.css">
+    <script src="countries.js"></script>
 </head>
 <body>
     <section>
@@ -19,31 +20,572 @@
                 <div><img src="./img/leaf_02.png"></div>
                 <div><img src="./img/leaf_03.png"></div>
                 <div><img src="./img/leaf_04.png"></div>
-
             </div>
-
         </div>
         <img src="./img/bg.jpg" class="bg">
         <img src="./img/girl.png" class="girl">
         <img src="./img/trees.png" class="trees">
-        <div class="login">
-            <h2>Sing In</h2>
-            <div class="inputBox">
-                <input type="text" placeholder="Username"
-            </div>
-            <div class="inputBox">
-                <input type="password" placeholder="Password"
-            </div>
-            <div class="inputBox">
-                <input type="submit" value="Login" id="btn">
-            </div>
-            <div class="group">
-                <a href="#">Forget Passord</a>
-                <a href="#">Signup</a>
-            </div>
-        </div>
         
+        <div class="login">
+            <!-- Theme Toggle Bar -->
+            <div class="theme-toggle-bar">
+                <button type="button" class="theme-switch-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light/Dark Theme">
+                    <span id="themeIcon">☀️</span>
+                    <span id="themeText">Light Mode</span>
+                </button>
+            </div>
+
+            <!-- Live Date & Time Display -->
+            <div class="datetime-container">
+                <div class="time-text" id="liveTime">00:00:00 AM</div>
+                <div class="date-text" id="liveDate">Loading date...</div>
+            </div>
+
+            <div class="form-toggle">
+                <button type="button" id="tab-signin" class="active" onclick="switchForm('signin')">Sign In</button>
+                <button type="button" id="tab-signup" onclick="switchForm('signup')">Sign Up</button>
+            </div>
+
+            <!-- Alert Notification -->
+            <div id="alertSuccess" class="alert-success"></div>
+
+            <!-- SIGN IN FORM -->
+            <form id="signin-form" class="form-fade" onsubmit="handleSignIn(event)">
+                <h2 id="form-title">Sign In</h2>
+                <div class="inputBox">
+                    <input type="text" id="signinUsername" placeholder="Username" required oninput="validateUsername('signinUsername', 'signinUsernameErr')">
+                </div>
+                <div id="signinUsernameErr" class="field-error"></div>
+
+                <div class="inputBox password-box">
+                    <input type="password" id="signinPassword" placeholder="Password" required>
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signinPassword', this)" title="Toggle password visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <label class="remember-box">
+                    <input type="checkbox" id="rememberMe">
+                    <span>Remember me on this device</span>
+                </label>
+
+                <div class="inputBox">
+                    <input type="submit" value="Login" id="btn">
+                </div>
+                <div class="group">
+                    <a href="#" onclick="switchForm('forgot'); return false;">Forgot Password</a>
+                    <a href="#" onclick="switchForm('signup'); return false;">Signup</a>
+                </div>
+            </form>
+
+            <!-- SIGN UP FORM -->
+            <form id="signup-form" style="display: none;" onsubmit="handleSignUp(event)">
+                <h2>Sign Up</h2>
+                <div class="inputBox">
+                    <input type="text" id="signupUsername" placeholder="Username" required oninput="validateUsername('signupUsername', 'signupUsernameErr')">
+                </div>
+                <div id="signupUsernameErr" class="field-error"></div>
+
+                <div class="phoneBox">
+                    <select id="countrySelect" required></select>
+                    <input type="tel" id="signupNumber" placeholder="Phone Number" required oninput="validatePhone('signupNumber', 'signupPhoneErr')">
+                </div>
+                <div id="signupPhoneErr" class="field-error"></div>
+
+                <div class="inputBox">
+                    <input type="email" id="signupGmail" placeholder="Gmail Address (@gmail.com)" required oninput="validateGmail('signupGmail', 'signupGmailErr')">
+                </div>
+                <div id="signupGmailErr" class="field-error"></div>
+
+                <div class="inputBox password-box">
+                    <input type="password" id="signupPassword" placeholder="Password" required oninput="checkPasswordStrength(this.value)">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signupPassword', this)" title="Toggle password visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Password Strength Meter -->
+                <div class="strength-container" id="strengthMeter" style="display: none;">
+                    <div class="strength-bar-bg">
+                        <div class="strength-bar-fill" id="strengthBar"></div>
+                    </div>
+                    <div class="strength-text">
+                        <span>Strength: <strong id="strengthLabel">Too Weak</strong></span>
+                        <span id="strengthHint">min 8 chars</span>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="inputBox password-box">
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required oninput="validateConfirmPassword()">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPassword', this)" title="Toggle password visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div id="confirmPasswordErr" class="field-error"></div>
+
+                <!-- Terms and Conditions Checkbox -->
+                <label class="remember-box" style="margin-top: 5px;">
+                    <input type="checkbox" id="acceptTerms" required>
+                    <span>I agree to the <a href="#" style="color: var(--primary-color);" onclick="alert('Terms & Conditions: Your data is safely protected.'); return false;">Terms & Privacy Policy</a></span>
+                </label>
+
+                <div class="inputBox">
+                    <input type="submit" value="Sign Up" id="btn-signup">
+                </div>
+                <div class="group">
+                    <a href="#" onclick="switchForm('signin'); return false;">Already have an account? Sign In</a>
+                </div>
+            </form>
+
+            <!-- FORGOT PASSWORD FORM -->
+            <form id="forgot-form" style="display: none;" onsubmit="handleForgotPassword(event)">
+                <h2>Forgot Password</h2>
+                <p style="text-align: center; color: #8f2c24; margin-bottom: 15px; font-size: 0.95em;">
+                    Enter your Gmail address to recover your account credentials.
+                </p>
+                <div class="inputBox">
+                    <input type="email" id="forgotGmail" placeholder="Enter your Gmail address" required>
+                </div>
+                <div class="inputBox">
+                    <input type="submit" value="Get Password" id="btn-forgot">
+                </div>
+                <div class="group">
+                    <a href="#" onclick="switchForm('signin'); return false;">Back to Sign In</a>
+                    <a href="#" onclick="switchForm('signup'); return false;">Create Account</a>
+                </div>
+            </form>
+        </div>
     </section>
-    
+
+    <script>
+        // Theme Toggle Logic
+        function initTheme() {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            applyTheme(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", newTheme);
+            applyTheme(newTheme);
+        }
+
+        function applyTheme(theme) {
+            const icon = document.getElementById("themeIcon");
+            const text = document.getElementById("themeText");
+            
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                if (icon) icon.textContent = "🌙";
+                if (text) text.textContent = "Dark Mode";
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                if (icon) icon.textContent = "☀️";
+                if (text) text.textContent = "Light Mode";
+            }
+        }
+
+        // Real-time Live Clock & Date Update
+        function updateDateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            const dateStr = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            const timeElem = document.getElementById("liveTime");
+            const dateElem = document.getElementById("liveDate");
+            if (timeElem) timeElem.textContent = timeStr;
+            if (dateElem) dateElem.textContent = dateStr;
+        }
+
+        // Populate countries dropdown & start clock & init theme & load remembered user
+        document.addEventListener("DOMContentLoaded", () => {
+            initTheme();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Load Remembered User
+            const savedUser = localStorage.getItem("rememberedUsername");
+            if (savedUser) {
+                const signinInput = document.getElementById("signinUsername");
+                const rememberCb = document.getElementById("rememberMe");
+                if (signinInput) signinInput.value = savedUser;
+                if (rememberCb) rememberCb.checked = true;
+            }
+
+            const select = document.getElementById("countrySelect");
+            if (select && typeof countriesData !== "undefined" && Array.isArray(countriesData)) {
+                select.innerHTML = "";
+                countriesData.forEach(c => {
+                    const opt = document.createElement("option");
+                    opt.value = `${c.flag} ${c.code}`;
+                    opt.textContent = `${c.flag} ${c.name} (${c.code})`;
+                    if (c.name === "Bangladesh") {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+            }
+        });
+
+        // Real-time Field Validations
+        function validateUsername(inputId, errId) {
+            const input = document.getElementById(inputId);
+            const err = document.getElementById(errId);
+            if (!input) return true;
+
+            const val = input.value.trim();
+            if (val.length > 0 && val.length < 3) {
+                input.classList.add("input-invalid");
+                input.classList.remove("input-valid");
+                if (err) {
+                    err.textContent = "⚠️ Username must be at least 3 characters";
+                    err.style.display = "block";
+                }
+                return false;
+            } else if (val.length >= 3) {
+                input.classList.remove("input-invalid");
+                input.classList.add("input-valid");
+                if (err) err.style.display = "none";
+                return true;
+            } else {
+                input.classList.remove("input-invalid", "input-valid");
+                if (err) err.style.display = "none";
+                return false;
+            }
+        }
+
+        function validatePhone(inputId, errId) {
+            const input = document.getElementById(inputId);
+            const err = document.getElementById(errId);
+            if (!input) return true;
+
+            const val = input.value.trim();
+            const phoneRegex = /^[0-9]{6,14}$/;
+            if (val.length > 0 && !phoneRegex.test(val.replace(/[\s-]/g, ''))) {
+                input.classList.add("input-invalid");
+                input.classList.remove("input-valid");
+                if (err) {
+                    err.textContent = "⚠️ Enter a valid phone number (6-14 digits)";
+                    err.style.display = "block";
+                }
+                return false;
+            } else if (val.length >= 6) {
+                input.classList.remove("input-invalid");
+                input.classList.add("input-valid");
+                if (err) err.style.display = "none";
+                return true;
+            } else {
+                input.classList.remove("input-invalid", "input-valid");
+                if (err) err.style.display = "none";
+                return false;
+            }
+        }
+
+        function validateGmail(inputId, errId) {
+            const input = document.getElementById(inputId);
+            const err = document.getElementById(errId);
+            if (!input) return true;
+
+            const val = input.value.trim().toLowerCase();
+            const isGmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val);
+            if (val.length > 0 && !isGmail) {
+                input.classList.add("input-invalid");
+                input.classList.remove("input-valid");
+                if (err) {
+                    err.textContent = "⚠️ Must be a valid Gmail address (@gmail.com)";
+                    err.style.display = "block";
+                }
+                return false;
+            } else if (isGmail) {
+                input.classList.remove("input-invalid");
+                input.classList.add("input-valid");
+                if (err) err.style.display = "none";
+                return true;
+            } else {
+                input.classList.remove("input-invalid", "input-valid");
+                if (err) err.style.display = "none";
+                return false;
+            }
+        }
+
+        function checkPasswordStrength(password) {
+            const meter = document.getElementById("strengthMeter");
+            const bar = document.getElementById("strengthBar");
+            const label = document.getElementById("strengthLabel");
+            const hint = document.getElementById("strengthHint");
+            const pwdInput = document.getElementById("signupPassword");
+
+            if (!password) {
+                meter.style.display = "none";
+                pwdInput.classList.remove("input-invalid", "input-valid");
+                return;
+            }
+
+            meter.style.display = "block";
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            if (score <= 1) {
+                bar.style.width = "25%";
+                bar.style.backgroundColor = "#ef4444";
+                label.textContent = "Weak 🔴";
+                label.style.color = "#ef4444";
+                hint.textContent = "Add digits & symbols";
+                pwdInput.classList.add("input-invalid");
+                pwdInput.classList.remove("input-valid");
+            } else if (score === 2) {
+                bar.style.width = "50%";
+                bar.style.backgroundColor = "#f59e0b";
+                label.textContent = "Fair 🟠";
+                label.style.color = "#f59e0b";
+                hint.textContent = "Add uppercase letter";
+                pwdInput.classList.remove("input-invalid", "input-valid");
+            } else if (score === 3) {
+                bar.style.width = "75%";
+                bar.style.backgroundColor = "#3b82f6";
+                label.textContent = "Good 🔵";
+                label.style.color = "#3b82f6";
+                hint.textContent = "Almost strong";
+                pwdInput.classList.add("input-valid");
+                pwdInput.classList.remove("input-invalid");
+            } else {
+                bar.style.width = "100%";
+                bar.style.backgroundColor = "#10b981";
+                label.textContent = "Strong 🟢";
+                label.style.color = "#10b981";
+                hint.textContent = "Great password!";
+                pwdInput.classList.add("input-valid");
+                pwdInput.classList.remove("input-invalid");
+            }
+
+            validateConfirmPassword();
+        }
+
+        function validateConfirmPassword() {
+            const pwd = document.getElementById("signupPassword").value;
+            const confirm = document.getElementById("confirmPassword").value;
+            const confirmInput = document.getElementById("confirmPassword");
+            const err = document.getElementById("confirmPasswordErr");
+
+            if (!confirm) {
+                confirmInput.classList.remove("input-invalid", "input-valid");
+                if (err) err.style.display = "none";
+                return true;
+            }
+
+            if (pwd !== confirm) {
+                confirmInput.classList.add("input-invalid");
+                confirmInput.classList.remove("input-valid");
+                if (err) {
+                    err.textContent = "❌ Passwords do not match!";
+                    err.style.display = "block";
+                }
+                return false;
+            } else {
+                confirmInput.classList.remove("input-invalid");
+                confirmInput.classList.add("input-valid");
+                if (err) err.style.display = "none";
+                return true;
+            }
+        }
+
+        // Auto Quick Fill Demo Data
+        function fillDemoCredentials(type) {
+            if (type === 'signin') {
+                document.getElementById("signinUsername").value = "AminulUser";
+                document.getElementById("signinPassword").value = "Pass1234!";
+                validateUsername('signinUsername', 'signinUsernameErr');
+            } else {
+                document.getElementById("signupUsername").value = "AminulSordar";
+                document.getElementById("signupNumber").value = "01712345678";
+                document.getElementById("signupGmail").value = "aminulsordar04@gmail.com";
+                document.getElementById("signupPassword").value = "Secret123!";
+                document.getElementById("confirmPassword").value = "Secret123!";
+                
+                validateUsername('signupUsername', 'signupUsernameErr');
+                validatePhone('signupNumber', 'signupPhoneErr');
+                validateGmail('signupGmail', 'signupGmailErr');
+                checkPasswordStrength("Secret123!");
+            }
+        }
+
+        function switchForm(type) {
+            const signinForm = document.getElementById("signin-form");
+            const signupForm = document.getElementById("signup-form");
+            const forgotForm = document.getElementById("forgot-form");
+            const tabSignin = document.getElementById("tab-signin");
+            const tabSignup = document.getElementById("tab-signup");
+            const alertBox = document.getElementById("alertSuccess");
+            
+            alertBox.style.display = "none";
+
+            const forms = [signinForm, signupForm, forgotForm];
+            forms.forEach(f => {
+                f.classList.remove("form-fade");
+                f.style.display = "none";
+            });
+
+            tabSignin.classList.remove("active");
+            tabSignup.classList.remove("active");
+
+            let targetForm;
+            if (type === "signup") {
+                targetForm = signupForm;
+                tabSignup.classList.add("active");
+            } else if (type === "forgot") {
+                targetForm = forgotForm;
+            } else {
+                targetForm = signinForm;
+                tabSignin.classList.add("active");
+            }
+
+            targetForm.style.display = "block";
+            // Trigger reflow to restart smooth CSS animation
+            void targetForm.offsetWidth;
+            targetForm.classList.add("form-fade");
+        }
+
+        async function handleSignUp(event) {
+            event.preventDefault();
+            const username = document.getElementById("signupUsername").value;
+            const countryCode = document.getElementById("countrySelect").value;
+            const number = document.getElementById("signupNumber").value;
+            const Gmail = document.getElementById("signupGmail").value;
+            const password = document.getElementById("signupPassword").value;
+            const alertBox = document.getElementById("alertSuccess");
+
+            const fullNumber = `${countryCode} ${number}`;
+
+            try {
+                const response = await fetch("/api/data", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username,
+                        number: fullNumber,
+                        Gmail,
+                        password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alertBox.style.display = "block";
+                    alertBox.style.color = "#8f2c24";
+                    alertBox.innerHTML = `
+                        🎉 <strong>successfully sign up</strong><br>
+                        <small style="font-weight: normal; margin-top: 5px; display: block;">
+                            User: <b>${data.data.username}</b> | Phone: <b>${data.data.number}</b> | Gmail: <b>${data.data.Gmail}</b>
+                        </small>
+                    `;
+                    document.getElementById("signup-form").reset();
+                } else {
+                    alertBox.style.display = "block";
+                    alertBox.style.color = "#d64c42";
+                    alertBox.innerHTML = `❌ Error: ${data.error || "Sign up failed"}`;
+                }
+            } catch (err) {
+                console.error("Sign up error:", err);
+                alertBox.style.display = "block";
+                alertBox.style.color = "#d64c42";
+                alertBox.innerHTML = "❌ Failed to connect to server API.";
+            }
+        }
+
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            const gmailInput = document.getElementById("forgotGmail").value.trim();
+            const alertBox = document.getElementById("alertSuccess");
+
+            try {
+                const response = await fetch("/api/data", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        action: "forgot_password",
+                        Gmail: gmailInput
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alertBox.style.display = "block";
+                    alertBox.style.color = "#8f2c24";
+                    alertBox.innerHTML = `
+                        🔑 <strong>Account Found!</strong><br>
+                        <span style="font-size: 0.95em; display: inline-block; margin-top: 6px;">
+                            Username: <b>${data.username}</b><br>
+                            Password: <b>${data.password}</b>
+                        </span>
+                    `;
+                } else {
+                    alertBox.style.display = "block";
+                    alertBox.style.color = "#d64c42";
+                    alertBox.innerHTML = `❌ ${data.error || "No account found with this Gmail address."}`;
+                }
+            } catch (err) {
+                console.error("Forgot password error:", err);
+                alertBox.style.display = "block";
+                alertBox.style.color = "#d64c42";
+                alertBox.innerHTML = "❌ Failed to query account data from server.";
+            }
+        }
+
+        function handleSignIn(event) {
+            event.preventDefault();
+            const username = document.getElementById("signinUsername").value.trim();
+            const rememberMe = document.getElementById("rememberMe").checked;
+            const alertBox = document.getElementById("alertSuccess");
+
+            if (rememberMe) {
+                localStorage.setItem("rememberedUsername", username);
+            } else {
+                localStorage.removeItem("rememberedUsername");
+            }
+
+            alertBox.style.display = "block";
+            alertBox.style.color = "var(--title-color)";
+            alertBox.innerHTML = `👋 Welcome back, <b>${username}</b>! Signed in successfully.`;
+        }
+
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const svg = btn.querySelector('svg');
+            if (input.type === 'password') {
+                input.type = 'text';
+                svg.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                input.type = 'password';
+                svg.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+        }
+    </script>
 </body>
 </html>

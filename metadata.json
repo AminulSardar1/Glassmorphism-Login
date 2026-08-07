@@ -1,0 +1,8 @@
+{
+  "name": "Glassmorphism Login",
+  "description": "Animated glassmorphism login interface with falling leaf animation",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
